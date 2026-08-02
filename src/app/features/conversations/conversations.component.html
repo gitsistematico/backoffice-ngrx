@@ -1,0 +1,112 @@
+<div class="conv-page">
+  <!-- Column 1: conversation list -->
+  <section class="conv-list">
+    <div class="list-header">
+      <h2>Conversaciones</h2>
+      <div class="filter-tabs">
+        <button [class.active]="filter === 'all'" (click)="filter = 'all'">Todas <span class="count">{{ conversations.length }}</span></button>
+        <button [class.active]="filter === 'pending'" (click)="filter = 'pending'">Pendientes <span class="count">{{ pendingCount }}</span></button>
+        <button [class.active]="filter === 'open'" (click)="filter = 'open'">Abiertas <span class="count">{{ openCount }}</span></button>
+        <button [class.active]="filter === 'closed'" (click)="filter = 'closed'">Cerradas</button>
+      </div>
+    </div>
+
+    <div class="list-body">
+      @for (conv of filteredConversations; track conv.id) {
+        <div class="conv-card" [class.selected]="selected?.id === conv.id" (click)="select(conv.id)">
+          <div class="avatar" [style.background]="conv.userAvatarColor" [style.color]="'#1a3530'" style="width:40px;height:40px;font-size:14px;">
+            {{ conv.userInitials }}
+          </div>
+          <div class="conv-info">
+            <div class="conv-top">
+              <span class="conv-name">{{ conv.userName }}</span>
+              <span class="conv-time">{{ timeAgo(conv.lastMessageTime) }}</span>
+            </div>
+            <div class="conv-bottom">
+              <span class="conv-flag">{{ conv.countryFlag }}</span>
+              <span class="conv-ref">{{ conv.conversationRef }}</span>
+              <span class="conv-preview">{{ conv.lastMessage }}</span>
+            </div>
+          </div>
+          @if (conv.unreadCount > 0) {
+            <span class="badge badge-green unread">{{ conv.unreadCount }}</span>
+          }
+          <span class="status-pill" [class.status-pending]="conv.status === 'pending'" [class.status-open]="conv.status === 'open'" [class.status-closed]="conv.status === 'closed'">
+            {{ statusLabel(conv.status) }}
+          </span>
+        </div>
+      }
+    </div>
+  </section>
+
+  <!-- Column 2: chat thread -->
+  <section class="chat-thread">
+    @if (selected; as conv) {
+      <div class="chat-header">
+        <div class="avatar" [style.background]="conv.userAvatarColor" style="width:36px;height:36px;font-size:13px;color:#1a3530;">{{ conv.userInitials }}</div>
+        <div class="chat-header-info">
+          <span class="chat-name">{{ conv.userName }}</span>
+          <span class="chat-meta">{{ conv.countryFlag }} {{ conv.country }} · {{ conv.language }} · {{ conv.conversationRef }}</span>
+        </div>
+        <span class="status-pill" [class.status-pending]="conv.status === 'pending'" [class.status-open]="conv.status === 'open'" [class.status-closed]="conv.status === 'closed'">
+          {{ statusLabel(conv.status) }}
+        </span>
+        <button class="close-btn" (click)="closeConv(conv.id)" [disabled]="conv.status === 'closed'">Cerrar conversación</button>
+      </div>
+
+      <div class="messages" #scrollContainer>
+        @for (msg of conv.messages; track msg.id) {
+          <div class="msg" [class.agent]="msg.sender === 'agent'">
+            <div class="msg-bubble">
+              <p>{{ msg.content }}</p>
+              <span class="msg-time">{{ formatTime(msg.timestamp) }}</span>
+            </div>
+          </div>
+        }
+      </div>
+
+      <div class="composer">
+        <input
+          type="text"
+          placeholder="Escribe un mensaje..."
+          [(ngModel)]="draft"
+          (keyup.enter)="send()"
+        />
+        <button class="send-btn" (click)="send()" [disabled]="!draft.trim()">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </button>
+      </div>
+    } @else {
+      <div class="empty-thread">Selecciona una conversación</div>
+    }
+  </section>
+
+  <!-- Column 3: user details -->
+  <section class="user-details">
+    @if (selected; as conv) {
+      <div class="details-header">
+        <div class="avatar" [style.background]="conv.userAvatarColor" style="width:64px;height:64px;font-size:22px;color:#1a3530;">{{ conv.userInitials }}</div>
+        <h3>{{ conv.userName }}</h3>
+        <span class="user-country">{{ conv.countryFlag }} {{ conv.country }}</span>
+      </div>
+
+      <div class="details-section">
+        <h4>Información</h4>
+        <div class="detail-row"><span>Idioma</span><span>{{ conv.language }}</span></div>
+        <div class="detail-row"><span>Referencia</span><span>{{ conv.conversationRef }}</span></div>
+        <div class="detail-row"><span>Estado</span><span class="status-pill" [class.status-pending]="conv.status === 'pending'" [class.status-open]="conv.status === 'open'" [class.status-closed]="conv.status === 'closed'">{{ statusLabel(conv.status) }}</span></div>
+        <div class="detail-row"><span>Ruta</span><span>{{ conv.route }}</span></div>
+        <div class="detail-row"><span>Inicio</span><span>{{ formatDate(conv.startedAt) }}</span></div>
+      </div>
+
+      <div class="details-section">
+        <h4>Acciones rápidas</h4>
+        <button class="action-btn">Ver perfil de usuario</button>
+        <button class="action-btn">Asignar a agente</button>
+        <button class="action-btn">Exportar conversación</button>
+      </div>
+    } @else {
+      <div class="empty-details">Sin detalles</div>
+    }
+  </section>
+</div>
