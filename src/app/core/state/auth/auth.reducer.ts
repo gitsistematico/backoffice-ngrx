@@ -1,10 +1,10 @@
 import { createReducer, on } from '@ngrx/store';
-import { User, Session } from '@supabase/supabase-js';
+import { AuthUser, AuthSession } from '../../models/auth.model';
 import { AuthActions } from './auth.actions';
 
 export interface AuthState {
-  user: User | null;
-  session: Session | null;
+  user: AuthUser | null;
+  session: AuthSession | null;
   loading: boolean;
   error: string | null;
   isAuthenticated: boolean;
@@ -55,7 +55,7 @@ export const authReducer = createReducer(
     session,
     loading: false,
     error: null,
-    isAuthenticated: !!session,
+    isAuthenticated: true,
   })),
 
   on(AuthActions.signupFailure, (state, { error }) => ({

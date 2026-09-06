@@ -6,7 +6,7 @@ import { Subscription } from 'rxjs';
 import { AppState } from '../../core/state/app.state';
 import { AuthActions } from '../../core/state/auth/auth.actions';
 import { selectAuthUser } from '../../core/state/auth/auth.selectors';
-import { User } from '@supabase/supabase-js';
+import { AuthUser } from '../../core/models/auth.model';
 
 @Component({
   selector: 'app-header',
@@ -17,7 +17,7 @@ import { User } from '@supabase/supabase-js';
 })
 export class HeaderComponent implements OnDestroy {
   @Input() title = '';
-  user: User | null = null;
+  user: AuthUser | null = null;
   menuOpen = false;
   private sub: Subscription;
 
@@ -43,10 +43,10 @@ export class HeaderComponent implements OnDestroy {
   }
 
   get initials(): string {
-    const email = this.user?.email ?? '';
-    if (!email) return '?';
-    const parts = email.split('@')[0].split(/[._-]/);
+    const name = this.user?.name ?? '';
+    if (!name) return '?';
+    const parts = name.split(' ');
     if (parts.length >= 2) return (parts[0][0] + parts[1][0]).toUpperCase();
-    return email.substring(0, 2).toUpperCase();
+    return name.substring(0, 2).toUpperCase();
   }
 }

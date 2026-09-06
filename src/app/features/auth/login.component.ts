@@ -11,7 +11,7 @@ import {
   selectAuthError,
   selectIsAuthenticated,
 } from '../../core/state/auth/auth.selectors';
-import { SupabaseService } from '../../core/services/supabase.service';
+import { MockAuthService } from '../../core/services/mock-auth.service';
 
 @Component({
   selector: 'app-login',
@@ -33,7 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   constructor(
     private store: Store<AppState>,
     private router: Router,
-    private supabase: SupabaseService,
+    private mockAuth: MockAuthService,
   ) {
     this.subs.push(this.store.select(selectAuthLoading).subscribe(l => this.loading = l));
     this.subs.push(this.store.select(selectAuthError).subscribe(e => this.error = e));
@@ -45,14 +45,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    this.supabase.supabase.auth.getSession().then(({ data }) => {
-      if (data.session && data.session.user) {
-        this.store.dispatch(AuthActions.restoreSession({
-          user: data.session.user,
-          session: data.session,
-        }));
-      }
-    });
+    const session = this.mockAuth.restoreSession();
+    if (session) {
+      this.store.dispatch(AuthActions.restoreSession({
+        user: session.user,
+        session,
+      }));
+    }
   }
 
   ngOnDestroy(): void {

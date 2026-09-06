@@ -4,7 +4,9 @@ import { provideRouter, RouterOutlet, Routes } from "@angular/router";
 import { provideStore } from "@ngrx/store";
 import { provideEffects } from "@ngrx/effects";
 import { provideStoreDevtools } from "@ngrx/store-devtools";
+import { Store } from "@ngrx/store";
 import { reducers } from "./app/core/state/app.state";
+import { AppState } from "./app/core/state/app.state";
 import { ConversationsEffects } from "./app/core/state/conversations/conversations.effects";
 import { AuthEffects } from "./app/core/state/auth/auth.effects";
 import { LayoutComponent } from "./app/layout/layout.component";
@@ -14,9 +16,7 @@ import { SettingsComponent } from "./app/features/settings/settings.component";
 import { LoginComponent } from "./app/features/auth/login.component";
 import { authGuard } from "./app/core/guards/auth.guard";
 import { guestGuard } from "./app/core/guards/guest.guard";
-import { SupabaseService } from "./app/core/services/supabase.service";
-import { Store } from "@ngrx/store";
-import { AppState } from "./app/core/state/app.state";
+import { MockAuthService } from "./app/core/services/mock-auth.service";
 import { AuthActions } from "./app/core/state/auth/auth.actions";
 import {
   HTTP_INTERCEPTORS,
@@ -64,20 +64,16 @@ const routes: Routes = [
   template: `<router-outlet />`,
 })
 export class App implements OnInit {
-  private supabase = inject(SupabaseService);
+  private mockAuth = inject(MockAuthService);
   private store = inject(Store<AppState>);
 
   ngOnInit(): void {
-    this.supabase.supabase.auth.onAuthStateChange((event, session) => {
-      (async () => {
-        if (session?.user && (event === 'SIGNED_IN' || event === 'TOKEN_REFRESHED' || event === 'INITIAL_SESSION')) {
-          this.store.dispatch(AuthActions.restoreSession({
-            user: session.user,
-            session,
-          }));
-        }
-      })();
-    });
+    const session = this.mockAuth.restoreSession();
+    if (session) {
+      this.store.dispatch(
+        AuthActions.restoreSession({ user: session.user, session }),
+      );
+    }
   }
 }
 
