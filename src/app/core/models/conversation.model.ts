@@ -1,7 +1,10 @@
+import { AdminUser } from "./user.model";
+
 export interface Message {
   id: string;
   conversationId: string;
-  sender: 'user' | 'agent';
+  conversationRef?: string;
+  sender: "user" | "agent";
   senderName: string;
   content: string;
   timestamp: Date;
@@ -18,11 +21,19 @@ export interface Conversation {
   countryFlag: string;
   language: string;
   conversationRef: string;
-  status: 'pending' | 'open' | 'closed';
+  status: "pending" | "open" | "closed";
   route: string;
   unreadCount: number;
   lastMessage: string;
   lastMessageTime: Date;
   startedAt: Date;
+  user?: AdminUser;
   messages: Message[];
+}
+
+export interface JoinedConversation {
+  id: number | string;
+  userId: string;
+  country: string;
+  userName?: string;
 }

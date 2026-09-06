@@ -8,7 +8,7 @@
     "demo": {
       "architect": {
         "build": {
-          "builder": "@angular/build:application",
+          "builder": "@ngx-env/builder:application",
           "configurations": {
             "development": {
               "extractLicenses": false,
@@ -31,12 +31,14 @@
             "outputPath": "dist/demo",
             "polyfills": [],
             "scripts": [],
-            "styles": ["src/global_styles.css"],
+            "styles": [
+              "src/global_styles.css"
+            ],
             "tsConfig": "tsconfig.app.json"
           }
         },
         "serve": {
-          "builder": "@angular/build:dev-server",
+          "builder": "@ngx-env/builder:dev-server",
           "configurations": {
             "development": {
               "buildTarget": "demo:build:development"
@@ -45,7 +47,8 @@
               "buildTarget": "demo:build:production"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "development",
+          "options": {}
         }
       },
       "prefix": "app",
