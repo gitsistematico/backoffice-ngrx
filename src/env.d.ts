@@ -3,6 +3,8 @@ declare interface Env {
   readonly NODE_ENV: string;
   readonly NG_APP_BACKEND_URL: string;
   readonly NG_APP_ALL_CONVERSATIONS_URL: string;
+  readonly VITE_SUPABASE_URL: string;
+  readonly VITE_SUPABASE_ANON_KEY: string;
 }
 
 // 1. Use import.meta.env.YOUR_ENV_VAR in your code. (conventional)
